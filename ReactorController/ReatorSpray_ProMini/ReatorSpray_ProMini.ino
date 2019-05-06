@@ -7,12 +7,12 @@ Thermistor temp2 (1);
 int comando;
 int timesolenoide = LOW;    // Variavel de tempo
 int ValSolenoide = 9;       //pino 9 do Arduino
-// controlador PWM
+
 volatile int val1, val2, val3;
 volatile int cont1;
 volatile int valor1 = 0;
 volatile boolean flag1;
-// cálculo da temperatura
+
 float temperatura_reator;
 float temperatura_banho;
 const int analogIn0 = A0;
@@ -21,6 +21,11 @@ int RawValue = 0;
 double Voltage = 0;
 double tempC = 0;
 
+float cont = 0;
+float TempM = 0;
+float soma = 0;
+int n_rodadas = 15;
+
 void setup() {
   Serial.begin(9600);
   pinMode(10, OUTPUT);            // bomba reator
@@ -28,17 +33,20 @@ void setup() {
   pinMode(8, OUTPUT);             // resistencia
   pinMode(9, OUTPUT);             // solenoide
   pinMode(11, OUTPUT);            // compressor
-  Timer1.initialize(1000000);     // Inicializa o Timer1 e configura para um período de 10 segundos
+  Timer1.initialize(1000000);     // Inicializa o Timer1 e configura para um período de 1 segundos
 
   cont1 = 0;
   flag1 = false;
   valor1 = 0;
 }
 
-void loop() {
-  if (Serial.available() > 0) {
+void loop()
+{
+  if (Serial.available() > 0) 
+  {
     comando = Serial.read();
-    switch (comando) {
+    switch (comando) 
+    {
       // comandos da bomba do resfriados
       case 'a': 
         digitalWrite(6, HIGH);
@@ -55,20 +63,32 @@ void loop() {
         break;
       // comandos da temperatura
       case 'e':
-        //temperatura_reator = temp1.getTemp();
-        RawValue = analogRead(analogIn0);
-        Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
-        temperatura_reator = Voltage * 0.1;
+        soma = 0;
+        for(int i = 0; i < n_rodadas; i++)
+        {
+          RawValue = analogRead(analogIn0);
+          Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
+          temperatura_reator = Voltage * 0.1;
+          soma = soma + temperatura_reator;
+          delay(100);
+        }
+        TempM = soma / n_rodadas;
         Serial.print(" ");
-        Serial.print(temperatura_reator);
+        Serial.print(TempM);
         break;
       case 'f':
-        //temperatura_banho = temp2.getTemp();
-        RawValue = analogRead(analogIn1);
-        Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
-        temperatura_banho = Voltage * 0.1;
+        soma = 0;
+        for(int i = 0; i < n_rodadas; i++)
+        {
+          RawValue = analogRead(analogIn1);
+          Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
+          temperatura_banho = Voltage * 0.1;
+          soma = soma + temperatura_banho;
+          delay(100);
+        }
+        TempM = soma / n_rodadas;
         Serial.print(" ");
-        Serial.print(temperatura_banho);
+        Serial.print(TempM);
         break;
       // comandos da resistencia
       case 'R':
