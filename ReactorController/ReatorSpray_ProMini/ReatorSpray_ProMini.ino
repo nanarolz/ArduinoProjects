@@ -1,20 +1,21 @@
 #include <Thermistor.h>
 #include <TimerOne.h>
+#include <MsTimer2.h>
 
 Thermistor temp1 (0);
 Thermistor temp2 (1);
 
 int comando;
 int timesolenoide = LOW;    // Variavel de tempo
-int ValSolenoide = 9;       //pino 9 do Arduino
+int ValSolenoide = 9;
 
 volatile int val1, val2, val3;
 volatile int cont1;
 volatile int valor1 = 0;
 volatile boolean flag1;
 
-float temperatura_reator;
-float temperatura_banho;
+float temperatura_reator = 0;
+float temperatura_banho = 0;
 const int analogIn0 = A0;
 const int analogIn1 = A1;
 int RawValue = 0;
@@ -26,14 +27,18 @@ float TempM = 0;
 float soma = 0;
 int n_rodadas = 15;
 
+int timecondensador = LOW;
+int condensador = 11;
+
 void setup() {
   Serial.begin(9600);
-  pinMode(10, OUTPUT);            // bomba reator
-  pinMode(6, OUTPUT);             // bomba resfriador
-  pinMode(8, OUTPUT);             // resistencia
-  pinMode(9, OUTPUT);             // solenoide
-  pinMode(11, OUTPUT);            // compressor
-  Timer1.initialize(1000000);     // Inicializa o Timer1 e configura para um período de 1 segundos
+  pinMode(10, OUTPUT);                      // bomba reator
+  pinMode(6, OUTPUT);                       // bomba resfriador
+  pinMode(8, OUTPUT);                       // resistencia
+  pinMode(9, OUTPUT);                       // solenoide
+  pinMode(11, OUTPUT);                      // condensador
+  Timer1.initialize(1000000);               // Inicializa o Timer1 e configura para um período de 1 segundos (microsegundos)
+  MsTimer2::set(60000,startcondensador);      // Inicializa o MsTimer2 e configura para um período de 1 minuto (milisegundos)
 
   cont1 = 0;
   flag1 = false;
@@ -47,22 +52,19 @@ void loop()
     comando = Serial.read();
     switch (comando) 
     {
-      // comandos da bomba do resfriados
-      case 'a': 
+      case 'a': // liga bomba resfriador
         digitalWrite(6, HIGH);
         break;
-      case 'b':
+      case 'b': // desliga bomba resfriador
         digitalWrite(6, LOW);
         break;
-      // comandos da bomba do reator
-      case 'c':
+      case 'c': // liga bomba reator
         digitalWrite(10, HIGH);
         break;
-      case 'd':
+      case 'd': // desliga bomba reator
         digitalWrite(10, LOW);
         break;
-      // comandos da temperatura
-      case 'e':
+      case 'e': // temperatura do reator
         soma = 0;
         for(int i = 0; i < n_rodadas; i++)
         {
@@ -76,7 +78,7 @@ void loop()
         Serial.print(" ");
         Serial.print(TempM);
         break;
-      case 'f':
+      case 'f': // temperatura do banho
         soma = 0;
         for(int i = 0; i < n_rodadas; i++)
         {
@@ -90,8 +92,7 @@ void loop()
         Serial.print(" ");
         Serial.print(TempM);
         break;
-      // comandos da resistencia
-      case 'R':
+      case 'R': // controle da resistencia
         delay(5);
         val1 = Serial.read();
         delay(5);
@@ -105,18 +106,17 @@ void loop()
         valor1 = int((val1 - 48) * 100 + (val2 - 48) * 10 + (val3 - 48));
         valor1 = valor1;
         break;
-      // comandos do compressor
-      case 'j':
-        digitalWrite(11, HIGH);
+      case 'j': // liga condensador 
+        MsTimer2::start();
         break;
-      case 'k':
-        digitalWrite(11, LOW);
+      case 'k': // desliga condensador
+        MsTimer2::stop();
+        digitalWrite(condensador, LOW);
         break;
-      // comandos da solenoide
-      case 'l':
+      case 'l': // liga solenoide
         Timer1.attachInterrupt(startvalsolenoide);
         break;
-      case 'm':
+      case 'm': // desliga solenoide
         Timer1.detachInterrupt();
         digitalWrite(ValSolenoide, LOW);
         break;
@@ -144,13 +144,7 @@ void loop()
   cont1++;
   delay(20);
   if (cont1 > 100) cont1 = 0;
-  /*
-    if (cont1 == 100 && flag1 == false)
-    {
-    digitalWrite(8, HIGH);
-    flag1 = true;
-    }
-  */
+
   if (cont1 > valor1 && flag1 == true)
   {
     digitalWrite(8, LOW);
@@ -164,7 +158,7 @@ void loop()
 }
 
 //Função que aciona a válvula solenoide
-void startvalsolenoide(void)
+void startvalsolenoide()
 {
   if (timesolenoide == LOW) {
     timesolenoide = HIGH;
@@ -173,4 +167,12 @@ void startvalsolenoide(void)
     timesolenoide = LOW;
   }
   digitalWrite(ValSolenoide, timesolenoide);
+}
+
+//Função que aciona o condensador
+void startcondensador()
+{
+  static boolean output = HIGH;
+  digitalWrite(condensador, output);
+  output = !output;
 }
