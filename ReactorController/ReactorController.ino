@@ -17,21 +17,28 @@ float cont = 0;
 float TempM = 0;
 float soma = 0;
 
-void setup() {
+void setup() 
+{
   Serial.begin(9600);
   pinMode(10, OUTPUT);            // bomba reator
   pinMode(6, OUTPUT);             // bomba resfriador
   pinMode(8, OUTPUT);             // resistencia
   pinMode(9, OUTPUT);             // solenoide
   pinMode(11, OUTPUT);            // compressor
-  Timer1.initialize(1000000);     // Inicializa o Timer1 e configura para um período de 10 segundos
+  Timer1.initialize(1000000);     // Inicializa o Timer1 e configura para um período de 1 segundos
+
+  cont1 = 0;
+  falg1 = false;
+  valor1 = 0
 }
 
-void loop() {
-
-  if (Serial.available() > 0) {
+void loop()
+{  
+  if (Serial.available() > 0)
+  {
     comando = Serial.read();
-    switch (comando) {
+    switch (comando) 
+    {
       // comandos da bomba do resfriados
       case 'a':
         digitalWrite(6, HIGH);
