@@ -1,4 +1,4 @@
-#include <Thermistor.h>
+#include <thermistor.h>
 #include <TimerOne.h>
 
 Thermistor temp1 (0);
@@ -13,6 +13,9 @@ volatile int cont1;
 volatile int valor1;
 volatile boolean flag1;
 
+float cont = 0;
+float TempM = 0;
+float soma = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -25,40 +28,45 @@ void setup() {
 }
 
 void loop() {
+
   if (Serial.available() > 0) {
     comando = Serial.read();
     switch (comando) {
       // comandos da bomba do resfriados
       case 'a':
         digitalWrite(6, HIGH);
-        //Serial.print(" ");
-        //Serial.print(char(comando));
         break;
       case 'b':
         digitalWrite(6, LOW);
-        //Serial.print(" ");
-        //Serial.print(char(comando));
         break;
       // comandos da bomba do reator
       case 'c':
         digitalWrite(10, HIGH);
-        //Serial.print(" ");
-        //Serial.print(char(comando));
         break;
       case 'd':
         digitalWrite(10, LOW);
-        //Serial.print(" ");
-        //Serial.print(char(comando));
         break;
       case 'e':                               // aquisição da temperatura da saída do reator
-        temperatura_reator = temp1.getTemp();
+        soma = 0;
+        for (int i = 0; i < 15; i++) {
+          temperatura_reator = temp1.getTemp();
+          soma = soma + temperatura_reator;
+          delay(100);
+        }
+        TempM = (soma / 15);
         Serial.print(" ");
-        Serial.print(temperatura_reator);
+        Serial.print(TempM);
         break;
       case 'f':                               // aquisição da tempereratura da saída do tanque de resistencia
-        temperatura_banho = temp2.getTemp();
+        soma = 0;
+        for (int i = 0; i < 15; i++) {
+          temperatura_banho = temp2.getTemp();
+          soma = soma + temperatura_banho;
+          delay(100);
+        }
+        TempM = (soma / 15);
         Serial.print(" ");
-        Serial.print(temperatura_banho);
+        Serial.print(TempM);
         break;
       // comandos da resistencia
       case 'R':
@@ -74,19 +82,13 @@ void loop() {
         if (val3 >= 176) val3 = val3 - 128;
         valor1 = int((val1 - 48) * 100 + (val2 - 48) * 10 + (val3 - 48));
         valor1 = valor1;
-        //Serial.print(" ");
-        //Serial.print(char(comando));
         break;
       // comandos do compressor
       case 'j':
         digitalWrite(11, HIGH);
-        //Serial.print(" ");
-        //Serial.print(char(comando));
         break;
       case 'k':
         digitalWrite(11, LOW);
-        //Serial.print(" ");
-        //Serial.print(char(comando));
         break;
       // comandos da solenoide
       case 'l':
@@ -98,17 +100,17 @@ void loop() {
         break;
     }
   }
-  
- // Contagem para atuação no relé da resistência
+
+  // Contagem para atuação no relé da resistência
   cont1++;
   delay(20);
   if (cont1 > 100) cont1 = 0;
   /*
-  if (cont1 == 100 && flag1 == false)
-  {
+    if (cont1 == 100 && flag1 == false)
+    {
     digitalWrite(8, HIGH);
     flag1 = true;
-  }
+    }
   */
   if (cont1 > valor1 && flag1 == true)
   {
@@ -120,8 +122,7 @@ void loop() {
     digitalWrite(8, HIGH);
     flag1 = true;
   }
-
-} // FIM DO LOOP
+}
 //Função que aciona a válvula solenoide
 void startvalsolenoide(void)
 {
