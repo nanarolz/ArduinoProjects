@@ -29,6 +29,11 @@ int n_rodadas = 15;
 
 int timecondensador = LOW;
 int condensador = 11;
+unsigned  long tempoatual;
+unsigned  long tempoinicial;
+unsigned  long tempotermino;
+int tempoON = 0;
+bool flag = false;
 
 void setup() {
   Serial.begin(9600);
@@ -38,7 +43,7 @@ void setup() {
   pinMode(9, OUTPUT);                       // solenoide
   pinMode(11, OUTPUT);                      // condensador
   Timer1.initialize(1000000);               // Inicializa o Timer1 e configura para um período de 1 segundos (microsegundos)
-  MsTimer2::set(60000,startcondensador);      // Inicializa o MsTimer2 e configura para um período de 1 minuto (milisegundos)
+  MsTimer2::set(1000, startcondensador);     // Inicializa o MsTimer2 e configura para um período de 1 minuto (milisegundos)
 
   cont1 = 0;
   flag1 = false;
@@ -47,10 +52,10 @@ void setup() {
 
 void loop()
 {
-  if (Serial.available() > 0) 
+  if (Serial.available() > 0)
   {
     comando = Serial.read();
-    switch (comando) 
+    switch (comando)
     {
       case 'a': // liga bomba resfriador
         digitalWrite(6, HIGH);
@@ -66,7 +71,7 @@ void loop()
         break;
       case 'e': // temperatura do reator
         soma = 0;
-        for(int i = 0; i < n_rodadas; i++)
+        for (int i = 0; i < n_rodadas; i++)
         {
           RawValue = analogRead(analogIn0);
           Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
@@ -80,7 +85,7 @@ void loop()
         break;
       case 'f': // temperatura do banho
         soma = 0;
-        for(int i = 0; i < n_rodadas; i++)
+        for (int i = 0; i < n_rodadas; i++)
         {
           RawValue = analogRead(analogIn1);
           Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
@@ -106,11 +111,28 @@ void loop()
         valor1 = int((val1 - 48) * 100 + (val2 - 48) * 10 + (val3 - 48));
         valor1 = valor1;
         break;
-      case 'j': // liga condensador 
+      case 'j': // liga condensador
+        delay(5);
+        val1 = Serial.read();
+        delay(5);
+        val2 = Serial.read();
+        delay(5);
+        val3 = Serial.read();
+        delay(5);
+        if (val1 >= 176) val1 = val1 - 128;
+        if (val2 >= 176) val2 = val2 - 128;
+        if (val3 >= 176) val3 = val3 - 128;
+        valor1 = int((val1 - 48) * 100 + (val2 - 48) * 10 + (val3 - 48));
+        valor1 = valor1 / 100;
+        tempoON = valor1 * 60000; // porcentagem do valor ligado
+        tempoinicial = millis();
+        tempotermino = tempoinicial + 60000;
+        tempoatual = millis();
         MsTimer2::start();
         break;
       case 'k': // desliga condensador
         MsTimer2::stop();
+        flag = false;
         digitalWrite(condensador, LOW);
         break;
       case 'l': // liga solenoide
@@ -155,6 +177,23 @@ void loop()
     digitalWrite(8, HIGH);
     flag1 = true;
   }
+  // funcionamento do condensador
+  if (flag)
+  {
+    tempoatual = millis();
+    if (tempoatual < tempoinicial + tempoON)
+    {
+      digitalWrite(condensador, HIGH);
+    } else
+    {
+      digitalWrite(condensador, LOW);
+    }
+    Serial.println((tempoinicial + tempoON) - tempoatual);
+    if (tempoatual > tempotermino) { // depois de um minuto reinicia o contador
+      tempoinicial = millis();
+      tempotermino = tempoinicial + 60000;
+    }
+  }
 }
 
 //Função que aciona a válvula solenoide
@@ -172,7 +211,5 @@ void startvalsolenoide()
 //Função que aciona o condensador
 void startcondensador()
 {
-  static boolean output = HIGH;
-  digitalWrite(condensador, output);
-  output = !output;
+  flag = true;
 }
