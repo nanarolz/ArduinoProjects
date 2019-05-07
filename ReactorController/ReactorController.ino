@@ -119,9 +119,9 @@ void loop()
         if (val6 >= 176) val6 = val6 - 128;
         valor2 = int((val4 - 48) * 100 + (val5 - 48) * 10 + (val6 - 48));
         valor2 = valor2 / 100;
-        tempoON = valor2 * 60000; // janela de 1 minuto
+        tempoON = valor2 * 120000; // janela de 1 minuto
         tempoinicial = millis();
-        tempotermino = tempoinicial + 60000;
+        tempotermino = tempoinicial + 120000;
         tempoatual = millis();
         MsTimer2::start();
         break;
