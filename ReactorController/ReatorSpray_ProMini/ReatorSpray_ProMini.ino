@@ -9,10 +9,12 @@ int comando;
 int timesolenoide = LOW;    // Variavel de tempo
 int ValSolenoide = 9;
 
-volatile int val1, val2, val3;
+volatile int val1 = 0;
+volatile int val2 = 0;
+volatile int val3 = 0;
 volatile int cont1;
-volatile int valor1 = 0;
-volatile boolean flag1;
+volatile float valor1 = 0;
+volatile boolean flag1 = false;
 
 float temperatura_reator = 0;
 float temperatura_banho = 0;
@@ -34,6 +36,10 @@ unsigned  long tempoinicial;
 unsigned  long tempotermino;
 int tempoON = 0;
 bool flag = false;
+volatile int val4 = 0;
+volatile int val5 = 0;
+volatile int val6 = 0;
+volatile float valor2 = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -113,18 +119,18 @@ void loop()
         break;
       case 'j': // liga condensador
         delay(5);
-        val1 = Serial.read();
+        val4 = Serial.read();
         delay(5);
-        val2 = Serial.read();
+        val5 = Serial.read();
         delay(5);
-        val3 = Serial.read();
+        val6 = Serial.read();
         delay(5);
-        if (val1 >= 176) val1 = val1 - 128;
-        if (val2 >= 176) val2 = val2 - 128;
-        if (val3 >= 176) val3 = val3 - 128;
-        valor1 = int((val1 - 48) * 100 + (val2 - 48) * 10 + (val3 - 48));
-        valor1 = valor1 / 100;
-        tempoON = valor1 * 60000; // porcentagem do valor ligado
+        if (val4 >= 176) val4 = val4 - 128;
+        if (val5 >= 176) val5 = val5 - 128;
+        if (val6 >= 176) val6 = val6 - 128;
+        valor2 = int((val4 - 48) * 100 + (val5 - 48) * 10 + (val6 - 48));
+        valor2 = valor2 / 100;
+        tempoON = valor2 * 60000; // janela de 1 minuto
         tempoinicial = millis();
         tempotermino = tempoinicial + 60000;
         tempoatual = millis();
@@ -165,30 +171,29 @@ void loop()
   // Contagem para atuação no relé da resistência
   cont1++;
   delay(20);
-  if (cont1 > 100) cont1 = 0;
 
-  if (cont1 > valor1 && flag1 == true)
-  {
-    digitalWrite(8, LOW);
-    flag1 = false;
-  }
+  if (cont1 > 100) cont1 = 0;
+  /*
+    if (cont1 > valor1 && flag1 == true)
+    {
+      digitalWrite(8, LOW);
+      flag1 = false;
+    }
+  */
   if (cont1 < valor1 && flag1 == false)
   {
     digitalWrite(8, HIGH);
     flag1 = true;
   }
-  // funcionamento do condensador
-  if (flag)
+
+  if (flag)  // funcionamento do condensador
   {
     tempoatual = millis();
-    if (tempoatual < tempoinicial + tempoON)
-    {
+    if (tempoatual < tempoinicial + tempoON){
       digitalWrite(condensador, HIGH);
-    } else
-    {
+    }else{
       digitalWrite(condensador, LOW);
     }
-    Serial.println((tempoinicial + tempoON) - tempoatual);
     if (tempoatual > tempotermino) { // depois de um minuto reinicia o contador
       tempoinicial = millis();
       tempotermino = tempoinicial + 60000;
@@ -196,20 +201,17 @@ void loop()
   }
 }
 
-//Função que aciona a válvula solenoide
-void startvalsolenoide()
+void startvalsolenoide() //Função que aciona a válvula solenoide
 {
   if (timesolenoide == LOW) {
     timesolenoide = HIGH;
-
   } else {
     timesolenoide = LOW;
   }
   digitalWrite(ValSolenoide, timesolenoide);
 }
 
-//Função que aciona o condensador
-void startcondensador()
+void startcondensador() //Função que aciona o condensador
 {
   flag = true;
 }
