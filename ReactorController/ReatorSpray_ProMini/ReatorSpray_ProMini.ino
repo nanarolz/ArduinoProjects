@@ -1,6 +1,5 @@
 #include <Thermistor.h>
 #include <TimerOne.h>
-#include <MsTimer2.h>
 
 Thermistor temp1 (0);
 Thermistor temp2 (1);
@@ -49,7 +48,6 @@ void setup() {
   pinMode(9, OUTPUT);                       // solenoide
   pinMode(11, OUTPUT);                      // condensador
   Timer1.initialize(1000000);               // Inicializa o Timer1 e configura para um período de 1 segundos (microsegundos)
-  MsTimer2::set(1000, startcondensador);     // Inicializa o MsTimer2 e configura para um período de 1 minuto (milisegundos)
 
   cont1 = 0;
   flag1 = false;
@@ -134,10 +132,9 @@ void loop()
         tempoinicial = millis();
         tempotermino = tempoinicial + 60000;
         tempoatual = millis();
-        MsTimer2::start();
+        flag = true;
         break;
       case 'k': // desliga condensador
-        MsTimer2::stop();
         flag = false;
         digitalWrite(condensador, LOW);
         break;
