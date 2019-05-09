@@ -1,4 +1,4 @@
-Dim Tempo
+﻿Dim Tempo
 Dim erro_ant As Double, soma As Double
 'Dim Kc As Double, tau_i As Double, tau_d As Double
 Dim Kcp As Double
@@ -94,7 +94,7 @@ Sub Timer1()
                 
             Else
 
-                char1 = "R" + "000"  + Chr(13)
+                char1 = "R" + "000" + Chr(13)
                 Put #1, , char1
                 Application.Wait TimeSerial(Hour(Now()), Minute(Now()), Second(Now()) + 1)
                 
@@ -138,9 +138,9 @@ Sub Timer1()
         End If
         
         If (Worksheets("Dados Experimentais").Cells(1, 1).Value = False) Then ' Resistência OFF
-            char1 = "R" + "000"
+            char1 = "R" + "000" + Chr(13)
             Put #1, , char1
-            char1 = "j" + "000"
+            char1 = "j" + "000" + Chr(13)
             Put #1, , char1
             Worksheets("Dados Experimentais").Cells(10, 1).Value = Int(R)
         End If
@@ -166,12 +166,12 @@ Public Sub StopTimer()
     Application.OnTime EarliestTime:=Tempo + TimeValue("00:00:05"), Procedure:="RunTimer", Schedule:=False
 
     ' zera a resistencia
-    char1 = "R" + "000"  + Chr(13)
+    char1 = "R" + "000" + Chr(13)
     Put #1, , char1
     Application.Wait TimeSerial(Hour(Now()), Minute(Now()), Second(Now()) + 1)
 
     ' zera o condensador
-    char1 = "j" + "000"  + Chr(13)
+    char1 = "j" + "000" + Chr(13)
     Put #1, , char1
     Application.Wait TimeSerial(Hour(Now()), Minute(Now()), Second(Now()) + 1)
     
