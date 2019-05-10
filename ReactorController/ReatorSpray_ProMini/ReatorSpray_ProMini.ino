@@ -33,7 +33,7 @@ int condensador = 11;
 unsigned  long tempoatual;
 unsigned  long tempoinicial;
 unsigned  long tempotermino;
-int tempoON = 0;
+float tempoON = 0;
 bool flag = false;
 volatile int val4 = 0;
 volatile int val5 = 0;
@@ -127,10 +127,10 @@ void loop()
         if (val5 >= 176) val5 = val5 - 128;
         if (val6 >= 176) val6 = val6 - 128;
         valor2 = int((val4 - 48) * 100 + (val5 - 48) * 10 + (val6 - 48));
-        valor2 = valor2 / 100;
-        tempoON = valor2 * 60000; // janela de 1 minuto
+        valor2 = valor2 / 100.0;
+        tempoON = valor2 * 120000.0; // janela de 2 minutos
         tempoinicial = millis();
-        tempotermino = tempoinicial + 60000;
+        tempotermino = tempoinicial + 120000;
         tempoatual = millis();
         flag = true;
         break;
@@ -190,10 +190,8 @@ void loop()
       digitalWrite(condensador, HIGH);
     }else{
       digitalWrite(condensador, LOW);
-    }
-    if (tempoatual > tempotermino) { // depois de um minuto reinicia o contador
-      tempoinicial = millis();
-      tempotermino = tempoinicial + 60000;
+      flag = false;
+      return;
     }
   }
 }
@@ -206,9 +204,4 @@ void startvalsolenoide() //Função que aciona a válvula solenoide
     timesolenoide = LOW;
   }
   digitalWrite(ValSolenoide, timesolenoide);
-}
-
-void startcondensador() //Função que aciona o condensador
-{
-  flag = true;
 }
