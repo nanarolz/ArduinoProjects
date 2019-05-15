@@ -57,13 +57,13 @@ void loop()
     comando = Serial.read();
     switch (comando)
     {
-      case 'a': // liga bomba resfriador
+      case 'a': // liga bomba reator
         digitalWrite(6, HIGH);
         break;
-      case 'b': // desliga bomba resfriador
+      case 'b': // desliga bomba reator
         digitalWrite(6, LOW);
         break;
-      case 'c': // liga bomba reator
+      case 'c': // liga bomba resfriador
         digitalWrite(10, HIGH);
         break;
       case 'd': // desliga bomba resfriador
@@ -118,7 +118,7 @@ void loop()
         if (val6 >= 176) val6 = val6 - 128;
         valor2 = int((val4 - 48) * 100 + (val5 - 48) * 10 + (val6 - 48));
         valor2 = valor2 / 100.0;
-        tempoON = valor2 * 120000.0; // janela de 1 minuto
+        tempoON = valor2 * 120000.0; // janela de 2 minutos
         tempoinicial = millis();
         tempotermino = tempoinicial + 120000;
         tempoatual = millis();
