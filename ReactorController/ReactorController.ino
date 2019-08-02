@@ -38,12 +38,13 @@ volatile float valor2 = 0;
 void setup()
 {
   Serial.begin(9600);
-  pinMode(10, OUTPUT);                        // bomba reator
-  pinMode(6, OUTPUT);                         // bomba resfriador
-  pinMode(8, OUTPUT);                         // resistencia
-  pinMode(9, OUTPUT);                         // solenoide
-  pinMode(11, OUTPUT);                        // compressor
-  Timer1.initialize(1000000);                 // Inicializa o Timer1 e configura para um período de 1 segundos
+  pinMode(7, OUTPUT);                        // bomba reator
+  digitalWrite(7, HIGH);                     // liga o relé, desliga a bomba
+  pinMode(10, OUTPUT);                       // bomba resfriador
+  pinMode(8, OUTPUT);                        // resistencia
+  pinMode(9, OUTPUT);                        // solenoide
+  pinMode(11, OUTPUT);                       // compressor
+  Timer1.initialize(500000);                // Inicializa o Timer1 e configura para um período de 1 segundos 1000000
   
   cont1 = 0;
   flag1 = false;
@@ -58,10 +59,10 @@ void loop()
     switch (comando)
     {
       case 'a': // liga bomba reator
-        digitalWrite(6, HIGH);
+        digitalWrite(7, LOW); // desliga o relé, liga a bomba
         break;
       case 'b': // desliga bomba reator
-        digitalWrite(6, LOW);
+        digitalWrite(7, HIGH); // liga o relé, para a bomba
         break;
       case 'c': // liga bomba resfriador
         digitalWrite(10, HIGH);
