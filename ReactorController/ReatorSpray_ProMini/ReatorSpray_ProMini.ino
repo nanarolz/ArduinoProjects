@@ -1,3 +1,9 @@
+/*
+ * BOARD:       Arduino Pro Mini
+ * PROCESSOR:   ATmega 168 (5V, 16MHz)
+ * PROGRAMMER:  AVRISP mkll
+ */
+
 #include <Thermistor.h>
 #include <TimerOne.h>
 
