@@ -45,7 +45,7 @@ void setup()
   pinMode(9, OUTPUT);                        // solenoide
   pinMode(11, OUTPUT);                       // compressor
   Timer1.initialize(500000);                // Inicializa o Timer1 e configura para um período de 1 segundos 1000000
-  
+
   cont1 = 0;
   flag1 = false;
   valor1 = 0;
@@ -138,6 +138,27 @@ void loop()
         break;
     }
   }
+
+  //   MONITORAR AS TEMEPERATURAS
+
+  soma = 0;
+  for (int i = 0; i < n_rodadas; i++) {
+    temperatura_reator = temp1.getTemp();
+    soma = soma + temperatura_reator;
+  }
+  TempM = (soma / n_rodadas);
+  Serial.print(TempM);
+
+  soma = 0;
+  for (int i = 0; i < n_rodadas; i++) {
+    temperatura_banho = temp2.getTemp();
+    soma = soma + temperatura_banho;
+  }
+  TempM = (soma / n_rodadas);
+  Serial.print(" , ");
+  Serial.println(TempM);
+  
+  delay(500);
 
   // Contagem para atuação no relé da resistência
   cont1++;
