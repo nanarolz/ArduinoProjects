@@ -153,23 +153,22 @@ void loop()
         break;
     }
   }
-  /*
-     MONITORAR AS TEMEPERATURAS
+  
+    // MONITORAR AS TEMEPERATURAS
 
           RawValue = analogRead(analogIn0);
           Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
           temperatura_reator = Voltage * 0.1;
-          Serial.print("A0: ");
+          //Serial.print("A0: ");
           Serial.print(temperatura_reator);
-          Serial.print("\n");
+          Serial.print(" , ");
           RawValue = analogRead(analogIn1);
           Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
           temperatura_banho = Voltage * 0.1;
-          Serial.print("A1: ");
-          Serial.print(temperatura_banho);
-          Serial.print("\n");
+          //Serial.print("A1: ");
+          Serial.println(temperatura_banho);
           delay(1000);
-  */
+  
 
   // Contagem para atuação no relé da resistência
   cont1++;
