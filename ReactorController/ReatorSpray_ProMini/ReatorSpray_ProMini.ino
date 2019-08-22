@@ -1,8 +1,8 @@
 /*
- * BOARD:       Arduino Pro Mini
- * PROCESSOR:   ATmega 168 (5V, 16MHz)
- * PROGRAMMER:  AVRISP mkll
- */
+   BOARD:       Arduino Pro Mini
+   PROCESSOR:   ATmega 168 (5V, 16MHz)
+   PROGRAMMER:  AVRISP mkll
+*/
 
 #include <Thermistor.h>
 #include <TimerOne.h>
@@ -120,6 +120,7 @@ void loop()
         if (val3 >= 176) val3 = val3 - 128;
         valor1 = int((val1 - 48) * 100 + (val2 - 48) * 10 + (val3 - 48));
         valor1 = valor1;
+        Serial.println(valor1);
         break;
       case 'j': // liga condensador
         delay(5);
@@ -153,22 +154,22 @@ void loop()
         break;
     }
   }
-  
-    // MONITORAR AS TEMEPERATURAS
 
-          RawValue = analogRead(analogIn0);
-          Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
-          temperatura_reator = Voltage * 0.1;
-          //Serial.print("A0: ");
-          Serial.print(temperatura_reator);
-          Serial.print(" , ");
-          RawValue = analogRead(analogIn1);
-          Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
-          temperatura_banho = Voltage * 0.1;
-          //Serial.print("A1: ");
-          Serial.println(temperatura_banho);
-          delay(1000);
-  
+  // MONITORAR AS TEMEPERATURAS
+
+  RawValue = analogRead(analogIn0);
+  Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
+  temperatura_reator = Voltage * 0.1;
+  //Serial.print("A0: ");
+  Serial.print(temperatura_reator);
+  Serial.print(" , ");
+  RawValue = analogRead(analogIn1);
+  Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
+  temperatura_banho = Voltage * 0.1;
+  //Serial.print("A1: ");
+  Serial.println(temperatura_banho);
+  delay(1000);
+
 
   // Contagem para atuação no relé da resistência
   cont1++;
@@ -191,9 +192,9 @@ void loop()
   if (flag)  // funcionamento do condensador
   {
     tempoatual = millis();
-    if (tempoatual < tempoinicial + tempoON){
+    if (tempoatual < tempoinicial + tempoON) {
       digitalWrite(condensador, HIGH);
-    }else{
+    } else {
       digitalWrite(condensador, LOW);
       flag = false;
       return;

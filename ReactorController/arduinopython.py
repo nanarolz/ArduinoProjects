@@ -25,7 +25,7 @@ from matplotlib.figure import Figure
 desligado = '#c0392b'
 ligado = '#2ecc71'
 cordefundo = '#ecf0f1'
-portastr = '/dev/ttyUSB2'
+portastr = ' '
 
 lista_tempo = []
 lista_treator = []
@@ -49,6 +49,10 @@ def arduinoonoff():
         btarduino["bg"] = desligado
         conexao.close()
     else:
+        porta = serial_ports()
+        portastr = str(porta[0])
+        conexao.port = portastr
+        lbporta["text"] = " PORTA: " + portastr
         conexao.open()
         if conexao.is_open == False:
             print("Sem conexão. Tente outra porta de comunicação")
@@ -178,9 +182,9 @@ janela.geometry("925x600+200+200") # LarguraxAltura+E+T
 
 conexao = serial.Serial()
 conexao.baudrate = 9600
-porta = serial_ports()
-portastr = str(porta[0])
-conexao.port = portastr
+#porta = serial_ports()
+#portastr = str(porta[0])
+#conexao.port = portastr
 
 #--------------------------------------------------------------------BOTÕES
 
