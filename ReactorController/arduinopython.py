@@ -14,6 +14,7 @@ import threading
 
 from tkinter import *
 from tkinter import filedialog
+from tkinter import messagebox
 from functools import partial
 import serial.tools.list_ports
 
@@ -50,15 +51,17 @@ def arduinoonoff():
         conexao.close()
     else:
         porta = serial_ports()
-        portastr = str(porta[0])
-        conexao.port = portastr
-        lbporta["text"] = " PORTA: " + portastr
-        conexao.open()
-        if conexao.is_open == False:
-            print("Sem conexão. Tente outra porta de comunicação")
+
+        if not serial_ports():
+            messagebox.showinfo("Erro", "Arduino não reconhecido. Conecte-o ou utilize outra porta de comunicação")
         else:
             btarduino["text"] = "PLACA ON"
             btarduino["bg"] = ligado
+            portastr = str(porta[0])
+            conexao.port = portastr
+            lbporta["text"] = " PORTA: " + portastr
+            conexao.open()
+
         
 def mudarporta():
     lbporta["text"] = " PORTA: " + edporta.get()
