@@ -1,4 +1,4 @@
-#include <thermistor.h>
+#include <Thermistor.h>
 #include <TimerOne.h>
 
 Thermistor temp1 (0);
@@ -20,6 +20,8 @@ volatile boolean flag1 = false;
 
 float cont = 0;
 float TempM = 0;
+float TempM1 = 0;
+float TempM2 = 0;
 float soma = 0;
 int n_rodadas = 15;
 
@@ -37,7 +39,7 @@ volatile float valor2 = 0;
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(19200);
   pinMode(7, OUTPUT);                        // bomba reator
   digitalWrite(7, HIGH);                     // liga o relé, desliga a bomba
   pinMode(10, OUTPUT);                       // bomba resfriador
@@ -92,6 +94,20 @@ void loop()
         Serial.print(" ");
         Serial.print(TempM);
         break;
+      case 'g': // aquisição de temperatura python
+        soma = 0;
+        for (int i = 0; i < n_rodadas; i++) {
+          temperatura_reator = temp1.getTemp();
+          soma = soma + temperatura_reator;
+        }
+        TempM1 = (soma / n_rodadas);
+        soma = 0;
+        for (int i = 0; i < n_rodadas; i++) {
+          temperatura_banho = temp2.getTemp();
+          soma = soma + temperatura_banho;
+        }
+        TempM2 = (soma / n_rodadas);
+        Serial.println(String(TempM1)+","+String(TempM2));
       case 'R': // liga resistencia
         delay(5);
         val1 = Serial.read();
@@ -138,27 +154,6 @@ void loop()
         break;
     }
   }
-
-  //   MONITORAR AS TEMEPERATURAS
-
-  soma = 0;
-  for (int i = 0; i < n_rodadas; i++) {
-    temperatura_reator = temp1.getTemp();
-    soma = soma + temperatura_reator;
-  }
-  TempM = (soma / n_rodadas);
-  Serial.print(TempM);
-
-  soma = 0;
-  for (int i = 0; i < n_rodadas; i++) {
-    temperatura_banho = temp2.getTemp();
-    soma = soma + temperatura_banho;
-  }
-  TempM = (soma / n_rodadas);
-  Serial.print(" , ");
-  Serial.println(TempM);
-  
-  delay(500);
 
   // Contagem para atuação no relé da resistência
   cont1++;
