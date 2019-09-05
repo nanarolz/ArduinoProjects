@@ -39,7 +39,7 @@ volatile float valor2 = 0;
 
 void setup()
 {
-  Serial.begin(19200);
+  Serial.begin(9600);
   pinMode(7, OUTPUT);                        // bomba reator
   digitalWrite(7, HIGH);                     // liga o relé, desliga a bomba
   pinMode(10, OUTPUT);                       // bomba resfriador
@@ -154,10 +154,9 @@ void loop()
         break;
     }
   }
-
   // Contagem para atuação no relé da resistência
   cont1++;
-  delay(20);
+  delay(50);
   if (cont1 > 100) cont1 = 0;
   /*
     if (cont1 == 100 && flag1 == false)
